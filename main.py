@@ -38,7 +38,7 @@ def Create():
     iot_number = input("type IOT number:" + uci)
     frame_number = input("type bike frame number:" + uci)
     bike_prority = input("Bike Priority. h = High, m = Medium, l = Low" + uci)
-
+    json_data = []
     with open(log_db_filepath , 'r') as readfile:
         json_data = readfile.readlines()
         decoded_data = json.loads(json_data[0])
@@ -47,7 +47,8 @@ def Create():
 
     with open(log_db_filepath ,'w') as writefile:
         Work_Order_Data = CreateWorkOrderLog( iot_number,frame_number,bike_prority)
-        json.dump(Work_Order_Data, writefile)
+        json_data.append(Work_Order_Data)
+        json.dump(json_data, writefile)
 
 def MainMenu():
     user_selection = input("Type an option:" + '\n' + "Create ,Edit ,Search or exit" + uci)
