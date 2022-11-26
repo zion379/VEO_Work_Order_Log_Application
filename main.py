@@ -17,20 +17,30 @@ def CreateWorkOrderLog(_IOT,_FrameNumber, _Proity):
         }
     }
 
-    json_string = json.dumps(work_order_log_data, indent=4)
+    json_string = json.dumps(work_order_log_data)
 
     return json_string
 
 #user command line input indicator
 uci = (' \n' + '>')
-log_db_filepath = 'Resources/worklogdatabase.txt'
+log_db_filepath = 'Resources/worklogdatabase.json'
 
-
+def Showall():
+    print("Show all Menu")
+    #read db
+    json_data = []
+    with open(log_db_filepath, 'r') as readfile:
+        json_data = readfile.readline()
+        decoded_data = json.loads(json_data)
+        for index, workorder in enumerate(decoded_data):
+            print(f"{workorder} at index {index}")
+        #print(f"{type(decoded_data)} Data: {decoded_data[1]}") # change this to 1 to show other data
+        print(len(decoded_data))
 def Search():
-    print("Search")
+    print("Search Menu")
 
 def Edit():
-    print("Edit Menu:")
+    print("Edit Menu")
 
 def Create():
     print("Create Work Order Log..")
@@ -38,25 +48,40 @@ def Create():
     iot_number = input("type IOT number:" + uci)
     frame_number = input("type bike frame number:" + uci)
     bike_prority = input("Bike Priority. h = High, m = Medium, l = Low" + uci)
-    json_data = []
-    with open(log_db_filepath , 'r') as readfile:
-        json_data = readfile.readlines()
-        decoded_data = json.loads(json_data[0])
-        print(decoded_data)
-        #left off working on reading file.
 
-    with open(log_db_filepath ,'w') as writefile:
-        Work_Order_Data = CreateWorkOrderLog( iot_number,frame_number,bike_prority)
-        json_data.append(Work_Order_Data)
-        json.dump(json_data, writefile)
+    json_data = []
+    decoded_data = []
+    try:
+        with open(log_db_filepath , 'r') as readfile:
+            json_data.append(readfile.readline())
+            for data in json_data:
+                decoded_data.append(json.loads(data))
+            #left off working on reading file.
+    except FileNotFoundError:
+        print("Data Base file not found creating new DB File...")
+    finally:
+        with open(log_db_filepath ,'w') as writefile:
+            Work_Order_Data = CreateWorkOrderLog( iot_number,frame_number,bike_prority)
+            decoded_data.append(Work_Order_Data)
+            #for data ... left off here
+            json_data.append(Work_Order_Data)
+            json.dump(json_data, writefile)
+            print("succesfully saved work order.")
 
 def MainMenu():
-    user_selection = input("Type an option:" + '\n' + "Create ,Edit ,Search or exit" + uci)
-
-    if 'create'or 'Create' in user_selection:
+    user_selection = input("Type an option:" + '\n' + "Create ,Edit ,Search, Show all or exit" + uci)
+    if 'create' in user_selection:
         Create()
     elif 'exit' in user_selection:
         exit()
+    elif 'show' in user_selection and 'all' in user_selection:
+        Showall()
+    elif 'edit' in user_selection:
+        Edit()
+    elif 'search' in user_selection:
+        Search()
+    else:
+        print("Enter a valid Command")
 
 while True:
     MainMenu()
